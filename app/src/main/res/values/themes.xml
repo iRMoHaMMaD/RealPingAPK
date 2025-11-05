@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- تم اصلی اپ بر پایه Material3 -->
+    <style name="Theme.RealPing" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- اگر خواستی استاتوس‌بار هم‌رنگ Primary شود -->
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
+    </style>
+
+    <!-- تم اسپلش -->
+    <style name="Theme.RealPing.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#0E1511</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/logo_realping</item>
+        <item name="postSplashScreenTheme">@style/Theme.RealPing</item>
+    </style>
+</resources>

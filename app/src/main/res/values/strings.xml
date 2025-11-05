@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RealPing</string>
+    <string name="brand_realping">RealPing</string>
+    <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="connected">Connected</string>
+    <string name="connecting">Connecting</string>
+    <string name="status_connected">Status: Connected</string>
+    <string name="status_connecting">Connecting…</string>
+    <string name="status_disconnected">Status: Disconnected</string>
+    <string name="connecting_message">Connecting to routing… Please wait</string>
+    <string name="import_routing">Import routing</string>
+    <string name="import_conf">Import routing (.conf)</string>
+    <string name="import_encrypted_file">Import encrypted file (.realping)</string>
+    <string name="import_clipboard">Import from clipboard (encrypted)</string>
+    <string name="import_title">Import routing</string>
+    <string name="import_desc">Choose one option below</string>
+    <string name="elapsed">Elapsed</string>
+    <string name="data_rx">Received</string>
+    <string name="data_tx">Sent</string>
+    <string name="routing_list_title">لیست روتینگ‌ها</string>
+    <string name="no_routings">هیچ روتینگی وارد نشده است</string>
+</resources>

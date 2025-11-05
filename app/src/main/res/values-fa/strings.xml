@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RealPing</string>
+    <string name="brand_realping">ریل پینگ</string>
+
+    <string name="connect">اتصال به روتینگ</string>
+    <string name="disconnect">قطع اتصال</string>
+    <string name="connected">متصل</string>
+    <string name="connecting">در حال اتصال</string>
+    <string name="status_connected">وضعیت: متصل</string>
+    <string name="status_connecting">در حال اتصال به روتینگ موردنظر…</string>
+    <string name="status_disconnected">وضعیت: قطع</string>
+    <string name="connecting_message">در حال اتصال به روتینگ… لطفاً صبر کنید</string>
+
+    <string name="import_routing">وارد کردن روتینگ</string>
+    <string name="import_conf">وارد کردن روتینگ (.conf)</string>
+    <string name="import_encrypted_file">وارد کردن فایل رمزگذاری‌شده (.realping)</string>
+    <string name="import_clipboard">وارد کردن از کلیپ‌بورد (رمزشده)</string>
+    <string name="import_title">وارد کردن روتینگ</string>
+    <string name="import_desc">یکی از روش‌های زیر را انتخاب کنید</string>
+
+    <string name="elapsed">مدت اتصال</string>
+    <string name="data_rx">داده دریافتی</string>
+    <string name="data_tx">داده ارسالی</string>
+
+    <!-- افزوده‌ها -->
+    <string name="routing_list_title">لیست روتینگ‌ها</string>
+    <string name="no_routings">هنوز روتینگی وارد نشده است.</string>
+</resources>
