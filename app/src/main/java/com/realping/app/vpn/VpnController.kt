@@ -24,6 +24,11 @@ object VpnController : Tunnel {
     @Volatile
     private var backend: GoBackend? = null
     private val opMutex = Mutex()
+    private val statsLock = Any()
+    @Volatile
+    private var lastTxBytes: Long = 0L
+    @Volatile
+    private var lastRxBytes: Long = 0L
 
     // --- helpers -------------------------------------------------------------
 
@@ -56,6 +61,7 @@ object VpnController : Tunnel {
 
         // لازم: سرویس باید بالا باشد تا protect(fd) قابل دسترس باشد
         startVpnService(ctx)
+        resetStatsCache()
 
         val cfg = withContext(Dispatchers.Default) {
             Config.parse(ByteArrayInputStream(configText.toByteArray()))
@@ -74,6 +80,7 @@ object VpnController : Tunnel {
         stopVpnService(ctx)
         // برای شروعِ پاک در ریلانچ
         backend = null
+        resetStatsCache()
     }
 
     fun getState(ctx: Context): State = ensureBackend(ctx).getState(this)
@@ -85,17 +92,35 @@ object VpnController : Tunnel {
      */
     fun getStatisticsNow(ctx: Context): Pair<Long, Long> {
         // ابتدا تلاش از backend
+        var rawTx = 0L
+        var rawRx = 0L
+        var fromBackend = false
         try {
             val stats = ensureBackend(ctx).getStatistics(this)
             val (tx, rx) = readBackendStatsSafely(stats)
             if (tx > 0L || rx > 0L) {
-                return tx to rx
+                rawTx = tx
+                rawRx = rx
+                fromBackend = true
             }
             // اگر هردو صفر/نامعتبر بودند، می‌افتیم روی TrafficStats
         } catch (_: Throwable) {
             // در خطا هم می‌افتیم روی TrafficStats
         }
-        return trafficStatsCumulative(ctx)
+        if (!fromBackend) {
+            val (fallbackTx, fallbackRx) = trafficStatsCumulative(ctx)
+            rawTx = fallbackTx
+            rawRx = fallbackRx
+        }
+
+        val normalized = synchronized(statsLock) {
+            val tx = if (rawTx >= lastTxBytes) rawTx else lastTxBytes
+            val rx = if (rawRx >= lastRxBytes) rawRx else lastRxBytes
+            lastTxBytes = tx
+            lastRxBytes = rx
+            tx to rx
+        }
+        return normalized
     }
 
     // --- reflection helpers (همان منطق نسخهٔ شما) -------------------------
@@ -149,5 +174,12 @@ object VpnController : Tunnel {
             }
         }
         return null
+    }
+
+    private fun resetStatsCache() {
+        synchronized(statsLock) {
+            lastTxBytes = 0L
+            lastRxBytes = 0L
+        }
     }
 }

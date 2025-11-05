@@ -8,28 +8,43 @@ import kotlin.math.max
 import kotlin.math.min
 
 object MtuDiscovery {
-    private const val IP_ICMP_HEADER = 0 // IPv4: 20 (IP) + 8 (ICMP)
+    private const val IP_ICMP_HEADER = 28 // IPv4: 20 (IP) + 8 (ICMP)
 
-    private suspend fun supportsMDo(): Boolean = withContext(Dispatchers.IO) {
-        try {
-            val proc = ProcessBuilder("/system/bin/ping", "-h").start()
-            proc.waitFor()
-            val out = proc.inputStream.bufferedReader().readText()
-            out.contains(" -M ") || out.contains("-M do")
-        } catch (_: Exception) { false }
+    @Volatile
+    private var supportsMDoCached: Boolean? = null
+
+    private suspend fun supportsMDo(): Boolean {
+        supportsMDoCached?.let { return it }
+        val result = withContext(Dispatchers.IO) {
+            try {
+                val proc = ProcessBuilder("/system/bin/ping", "-h").start()
+                val output = proc.inputStream.bufferedReader().use { it.readText() }
+                proc.waitFor()
+                output.contains(" -M ") || output.contains("-M do")
+            } catch (_: Exception) {
+                false
+            }
+        }
+        supportsMDoCached = result
+        return result
     }
 
     private suspend fun pingOk(payloadSize: Int): Boolean = withContext(Dispatchers.IO) {
         // Linux/Android معادل: ping -M do -s <size> -c 1 -W 1 8.8.8.8
         val args = mutableListOf("/system/bin/ping", "-s", payloadSize.toString(), "-c", "1", "-W", "1", "8.8.8.8")
-        if (supportsMDo()) { args.add(1, "-M"); args.add(2, "do") }
+        if (supportsMDo()) {
+            args.add(1, "-M")
+            args.add(2, "do")
+        }
         try {
             val proc = ProcessBuilder(args).redirectErrorStream(true).start()
-            val code = proc.waitFor()
             val text = proc.inputStream.bufferedReader().use(BufferedReader::readText)
+            val code = proc.waitFor()
             // موفق وقتی: کد خروج 0 و شامل ttl/time باشد
             code == 0 && (text.contains("ttl=") || text.contains("time="))
-        } catch (_: Exception) { false }
+        } catch (_: Exception) {
+            false
+        }
     }
 
     /** جست‌وجوی دودویی برای بیشینهٔ payload بدون فروگمنت. بازگشت: MTU واقعی (payload+28) */
