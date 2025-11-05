@@ -266,11 +266,15 @@ class ProxyManager(
     private fun pipe(`in`: InputStream, out: OutputStream) {
         val buf = ByteArray(16 * 1024)
         try {
+            var wrote = false
             while (true) {
                 val n = `in`.read(buf)
                 if (n <= 0) break
                 out.write(buf, 0, n)
-                out.flush()
+                wrote = true
+            }
+            if (wrote) {
+                try { out.flush() } catch (_: Throwable) {}
             }
         } catch (_: Throwable) { /* normal */ }
     }

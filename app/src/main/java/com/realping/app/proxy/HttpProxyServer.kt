@@ -243,11 +243,15 @@ class HttpProxyServer(
 
     private fun pipe(input: InputStream, output: OutputStream) {
         val buf = ByteArray(64 * 1024)
+        var wrote = false
         while (true) {
             val n = input.read(buf)
             if (n <= 0) break
             output.write(buf, 0, n)
-            output.flush()
+            wrote = true
+        }
+        if (wrote) {
+            try { output.flush() } catch (_: Throwable) {}
         }
     }
 }
